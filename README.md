@@ -1,10 +1,10 @@
 # ![nf-core/gwas](docs/images/nf-core-gwas_logo.png)
 
-**A pipeline for Genome Wide Association Studies**.
+**This is a new skeleton pipeline**.
 
 [![GitHub Actions CI Status](https://github.com/nf-core/gwas/workflows/nf-core%20CI/badge.svg)](https://github.com/nf-core/gwas/actions)
 [![GitHub Actions Linting Status](https://github.com/nf-core/gwas/workflows/nf-core%20linting/badge.svg)](https://github.com/nf-core/gwas/actions)
-[![Nextflow](https://img.shields.io/badge/nextflow-%E2%89%A519.10.0-brightgreen.svg)](https://www.nextflow.io/)
+[![Nextflow](https://img.shields.io/badge/nextflow-%E2%89%A520.04.0-brightgreen.svg)](https://www.nextflow.io/)
 
 [![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg)](https://bioconda.github.io/)
 [![Docker](https://img.shields.io/docker/automated/nfcore/gwas.svg)](https://hub.docker.com/r/nfcore/gwas)
@@ -18,12 +18,12 @@ The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
 
 1. Install [`nextflow`](https://nf-co.re/usage/installation)
 
-2. Install either [`Docker`](https://docs.docker.com/engine/installation/) or [`Singularity`](https://www.sylabs.io/guides/3.0/user-guide/) for full pipeline reproducibility _(please only use [`Conda`](https://conda.io/miniconda.html) as a last resort; see [docs](https://nf-co.re/usage/configuration#basic-configuration-profiles))_
+2. Install any of [`Docker`](https://docs.docker.com/engine/installation/), [`Singularity`](https://www.sylabs.io/guides/3.0/user-guide/) or [`Podman`](https://podman.io/) for full pipeline reproducibility _(please only use [`Conda`](https://conda.io/miniconda.html) as a last resort; see [docs](https://nf-co.re/usage/configuration#basic-configuration-profiles))_
 
 3. Download the pipeline and test it on a minimal dataset with a single command:
 
     ```bash
-    nextflow run nf-core/gwas -profile test,<docker/singularity/conda/institute>
+    nextflow run nf-core/gwas -profile test,<docker/singularity/podman/conda/institute>
     ```
 
     > Please check [nf-core/configs](https://github.com/nf-core/configs#documentation) to see if a custom config file to run nf-core pipelines already exists for your Institute. If so, you can simply use `-profile <institute>` in your command. This will enable either `docker` or `singularity` and set the appropriate execution settings for your local compute environment.
@@ -33,20 +33,75 @@ The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
     <!-- TODO nf-core: Update the example "typical command" below used to run the pipeline -->
 
     ```bash
-    nextflow run nf-core/gwas -profile <docker/singularity/conda/institute> --input '*_R{1,2}.fastq.gz' --genome GRCh37
+    nextflow run nf-core/gwas -profile <docker/singularity/podman/conda/institute> --input samplesheet.csv --genome GRCh37
     ```
 
-See [usage docs](docs/usage.md) for all of the available options when running the pipeline.
+See [usage docs](https://nf-co.re/gwas/usage) for all of the available options when running the pipeline.
 
 ## Documentation
 
-The nf-core/gwas pipeline comes with documentation about the pipeline which you can read at [https://nf-core/gwas/docs](https://nf-core/gwas/docs) or find in the [`docs/` directory](docs).
+The nf-core/gwas pipeline comes with documentation about the pipeline: [usage](https://nf-co.re/gwas/usage) and [output](https://nf-co.re/gwas/output).
 
 <!-- TODO nf-core: Add a brief overview of what the pipeline does and how it works -->
 
+<!-- From Raquel Genomics imputaiton pipeline-->
+
+
+A tool for imputation of genotype array datasets from dbGaP. The Genotype Imputation Pipeline consists of the following steps:
+
+0. Identify input genome build version automatically
+1. Lift the input to build GRCh37 (hg19)
+2. Quality control 1: LD-based fix of strand flips, fix strand swaps, filter variants by missingness
+3. Split samples by ancestry
+4. Quality control 2: filter samples by missingness, filter variants by HWE
+5. Phase
+6. Impute
+
+
+## Dependencies
+The pipeline was tested in garibaldi using the following required software and packages:
+
+- R v3.5.1
+- vcftools v0.1.14
+- PLINK v1.9
+- PLINK v2.00a3LM 64-bit Intel
+- samtools v1.9
+- GenotypeHarmonizer v1.4.20
+- ADMIXTURE
+- Eagle v2.4
+- Minimac4
+- liftOver
+
+## How to run
+
+
+### Step 0: Check genome build and select chain file
+
+
+Where:
+- myinput is the full path to the input genotype array dataset in either vcf or vcf.gz format
+- myoutput is the full path to save the output of this step
+- gz (gz=yes or gz=no) is whether the input file is either vcf or vcf.gz format
+
+The output file will have the sufix *.BuildChecked
+
+### Step 1: Lifeover input genotype array to GRCh37 build
+
+### Step 2: LD-based fix of strand flips, fix strand swaps and mismatching alleles, and initial quality control (90% missingnes per variant)
+
+### Step 3: Estimate ancestry and split samples by ancestry
+
+### Step 4: 2nd quality control
+
+### Step 5: Phasing
+
+### Step 6: Imputation and post-imputation quality control
+
+
+
 ## Credits
 
-nf-core/gwas was originally written by Jesper Gådin.
+nf-core/gwas was originally written by Abhinav Sharma, Raquel Dias, Alain Coletta.
 
 ## Contributions and Support
 

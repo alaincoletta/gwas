@@ -1,0 +1,6 @@
+vcfFile:
+  /root/A4420_2020_1.vcf
+buildCheckFile:
+  /root/A4420_2020_1.BuildChecked
+outDir:
+  /root/lift
