@@ -11,6 +11,7 @@ process CHECK_VCF_BUILD {
 
     shell:
         '''
+myinput=!{vcfFile}
 if [[ ${myinput} == *.vcf ]]; then
     echo "Input autosome list detected, run parallel pipeline."
     my_chr1='my_chr1.txt'
@@ -40,7 +41,8 @@ Rscript /app/required_tools/check_vcf_build/check_vcf_build.R $mydirname/$filena
 workflow test {
 
     params.myoutput = "output.BuildChecked"
+    params.vcfFile = "/root/A4420_2020_1.vcf"
     rawFileChannel = Channel.fromPath(params.vcfFile)
-    check_vcf_build(rawFileChannel)
+    CHECK_VCF_BUILD(rawFileChannel)
 
 }
