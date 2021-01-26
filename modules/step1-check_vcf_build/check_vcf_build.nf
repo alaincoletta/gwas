@@ -1,28 +1,29 @@
-nextflow.enable.dsl=2
+nextflow.enable.dsl = 2
 
-params.vcfFile = null
+//params.vcfFile
 
-process check_vcf_build {
+process CHECK_VCF_BUILD {
 
-  input:
-  file vcfFile
-  output:
-  file("*.BuildChecked")
+    input:
+    file vcfFile
 
-  script:
+    output:
+    file("*.BuildChecked")
+
+    script:
     """
-      /app/0_check_vcf_build.slurm.sh $vcfFile .
+    /app/0_check_vcf_build.slurm.sh $vcfFile .
     """
 
-  stub:
+    stub:
     """
-      touch dummy.BuildChecked
+    touch dummy.BuildChecked
     """
 }
 
-workflow test{
+workflow test {
 
-  rawFileChannel = Channel.fromPath(params.vcfFile)
-  check_vcf_build(rawFileChannel)
+    rawFileChannel = Channel.fromPath(params.vcfFile)
+    check_vcf_build(rawFileChannel)
 
 }
