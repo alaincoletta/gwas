@@ -4,10 +4,11 @@ nextflow.enable.dsl = 2
 
 process CHECK_VCF_BUILD {
     input:
-    path(vcfFile)
+    tuple path(vcfFile),
+    path(myOutput)
 
     output:
-    path("*.BuildChecked")
+    path(myOutput)
 
     shell:
         '''
@@ -40,9 +41,14 @@ Rscript /app/required_tools/check_vcf_build/check_vcf_build.R $mydirname/$filena
 
 workflow test {
 
-    params.myoutput = "output.BuildChecked"
-    params.vcfFile = "/root/A4420_2020_1.vcf"
-    rawFileChannel = Channel.fromPath(params.vcfFile)
-    CHECK_VCF_BUILD(rawFileChannel)
+    params.vcfFile = "$baseDir/testData/myvcf.vcf"
+    params.myOutput = "$baseDir/testData/output.BuildChecked"
+    
+    check_vcf_params_ch = Channel.of([
+            file(params.vcfFile),
+            file(params.myOutput),
+    ])
+
+    CHECK_VCF_BUILD(check_vcf_params_ch)
 
 }

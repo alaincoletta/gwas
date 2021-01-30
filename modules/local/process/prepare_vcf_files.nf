@@ -7,17 +7,18 @@ nextflow.enable.dsl=2
 
 process PREPARE_VCF_FILES{
 
-    publishDir "${params.outdir}"
-    container "geneplaza/imputation2"
+    publishDir "${launchDir}/testData"
+    //container "gwas/imputation2"
     
     input:
-    path vcf_file
+    path vcfFile
     
     output:
     path  "myvcf.vcf.gz" 
 
     shell:
     '''
+myinput = !{vcfFile}
 # test if input came as split chromosome
 if [[ ${myinput} == *.vcf ]]; then
     bgzip -c ${myinput} > myvcf.vcf.gz
@@ -38,16 +39,9 @@ fi
 }
 
 workflow test{
-    params.outdir = "${launchDir}/testData"
-    params.vcf_file = "${launchDir}/testData/myvcf.vcf"
-    ch_vcf_file = channel.fromPath(params.vcf_file)
+    params.vcfFile = "${launchDir}/testData/myvcf.vcf"
+    ch_vcfFile = channel.fromPath(params.vcfFile)
 
-   PREPARE_VCF_FILES(ch_vcf_file)
-//    PREPARE_VCF_FILES.out.dummyOuput 
-    
-//  CHECK_SORT_VCF(
-//          PREPARE_VCF_FILES.out.dummyOuput  
-//    )
-
+   PREPARE_VCF_FILES(ch_vcfFile)
 
 }

@@ -11,14 +11,14 @@ nextflow.enable.dsl=2
 
  process CHECK_SORT_VCF{
         publishDir "${params.outdir}"
-        container "geneplaza/imputation2"
+        //container "gwas/imputation2"
 
         input:
-        path merged_vcf_file 
+        path mergedVcfFile 
     
         shell:
         '''
-    myinput=!{merged_vcf_file}
+    myinput=!{mergedVcfFile}
 
     bcftools sort myvcf.vcf.gz -t ${temp} -oz -o ./myvcf.sorted.vcf.gz
     tabix -p vcf ./myvcf.sorted.vcf.gz
@@ -34,14 +34,15 @@ nextflow.enable.dsl=2
  }
 
  workflow test{
-     include { PREPARE_VCF_FILES } from "$baseDir/module/process/prepare_vcf_files.nf"
-     params.outdir = 'outdir'
-     params.merged_vcf_file = "myvcf.vcf.gz"
-     ch_merged_vcf_file = channel.fromPath(params.merged_vcf_file)
+    include { PREPARE_VCF_FILES } from "$baseDir/module/process/prepare_vcf_files.nf"
+     
+    params.outdir = "lift"
+    params.mergedVcfFile = "myvcf.vcf.gz"
+    ch_mergedVcfFile = channel.fromPath(params.mergedVcfFile)
 
     
  CHECK_SORT_VCF(
-         PREPARE_VCF_FILES.out.dummyOuput  
+         PREPARE_VCF_FILES.out.dummyOuput 
    )
 
 
