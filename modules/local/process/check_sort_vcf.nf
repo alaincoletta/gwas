@@ -10,8 +10,8 @@ nextflow.enable.dsl=2
  */
 
  process CHECK_SORT_VCF{
-        publishDir "${params.outdir}"
-        //container "gwas/imputation2"
+        publishDir "${params.outdir}", mode:'copy'
+        container "gwas/imputation2"
 
         input:
         path mergedVcfFile 
@@ -19,11 +19,12 @@ nextflow.enable.dsl=2
         shell:
         '''
     myinput=!{mergedVcfFile}
+    myoutput=!{params.myOutput}
 
-    bcftools sort myvcf.vcf.gz -t ${temp} -oz -o ./myvcf.sorted.vcf.gz
-    tabix -p vcf ./myvcf.sorted.vcf.gz
+    bcftools sort ${myinput} -t ${temp} -oz -o ${myOutput}
+    tabix -p vcf ${myOutput} 
     for i in {1..22}; do
-      bcftools view ./myvcf.sorted.vcf.gz -r ${i} -oz -o chr${i}.sorted.vcf.gz;
+      bcftools view ${myOutput} -r ${i} -oz -o chr${i}.sorted.vcf.gz;
     done
         '''
 
@@ -34,15 +35,15 @@ nextflow.enable.dsl=2
  }
 
  workflow test{
-    include { PREPARE_VCF_FILES } from "$baseDir/module/process/prepare_vcf_files.nf"
+    include { PREPARE_VCF_FILES } from "$launchDir/modules/local/process/prepare_vcf_files.nf"
      
-    params.outdir = "lift"
-    params.mergedVcfFile = "myvcf.vcf.gz"
-    ch_mergedVcfFile = channel.fromPath(params.mergedVcfFile)
+    params.outdir = "$launchDir/testData/lift"
+    // params.mergedVcfFile = "myvcf.vcf.gz"   --> use output from PREPARE_VCF_FILES
+    //ch_mergedVcfFile = channel.fromPath(params.mergedVcfFile)
 
     
  CHECK_SORT_VCF(
-         PREPARE_VCF_FILES.out.dummyOuput 
+         PREPARE_VCF_FILES.out
    )
 
 
