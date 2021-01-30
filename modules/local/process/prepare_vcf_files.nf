@@ -7,7 +7,7 @@ nextflow.enable.dsl=2
 
 process PREPARE_VCF_FILES{
 
-    publishDir "${params.outputDir}", mode: 'copy'   
+    publishDir "${params.outputDir}"   
     container "gwas/imputation2"
     
     input:
@@ -15,14 +15,14 @@ process PREPARE_VCF_FILES{
     path(myOutput)
     
     output:
-    path(myOutput)
+        path(myOutput)
 
     shell:
     '''
-echo "!{params.vcfFile}"
-echo "!{params.myOutput}"
-myinput=!{params.vcfFile}
-myoutput=!{params.myOutput}
+echo "!{vcfFile}"
+echo "!{myOutput}"
+myinput=!{vcfFile}
+myoutput=!{myOutput}
 # test if input came as split chromosome
 if [[ ${myinput} == *.vcf ]]; then
     bgzip -c ${myinput} > ${myoutput}
