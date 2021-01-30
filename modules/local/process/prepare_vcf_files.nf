@@ -1,29 +1,33 @@
 nextflow.enable.dsl=2
 
 /*
- * prepare VCF files split by chromosome and GZIP
+ * prepare VCF files ONLY happens if input is split by chromosome and/or input is not compressed 
  */
 
 
 process PREPARE_VCF_FILES{
 
-    publishDir "${launchDir}/testData"
-    //container "gwas/imputation2"
+    publishDir "${params.outputDir}", mode: 'copy'   
+    container "gwas/imputation2"
     
     input:
-    path vcfFile
+    tuple path(vcfFile),
+    path(myOutput)
     
     output:
-    path  "myvcf.vcf.gz" 
+    path(myOutput)
 
     shell:
     '''
-myinput = !{vcfFile}
+echo "!{params.vcfFile}"
+echo "!{params.myOutput}"
+myinput=!{params.vcfFile}
+myoutput=!{params.myOutput}
 # test if input came as split chromosome
 if [[ ${myinput} == *.vcf ]]; then
-    bgzip -c ${myinput} > myvcf.vcf.gz
+    bgzip -c ${myinput} > ${myoutput}
 elif [[ ${myinput} == *.vcf.gz ]]; then
-    cp ${myinput} myvcf.vcf.gz
+    cp ${myinput} ${myoutput}
     echo "input file is merged; split by chromsome."
 else
     echo "invalid file format, please check the input."
@@ -39,9 +43,16 @@ fi
 }
 
 workflow test{
-    params.vcfFile = "${launchDir}/testData/myvcf.vcf"
-    ch_vcfFile = channel.fromPath(params.vcfFile)
+    
+    params.outputDir = "$launchDir/testData/"
+    params.vcfFile = "$launchDir/testData/myvcf.vcf"
+    params.myOutput = "$launchDir/testData/myvcf.vcf.gz"
 
-   PREPARE_VCF_FILES(ch_vcfFile)
+    prepare_vcf_params_ch = Channel.of([
+            params.vcfFile,
+            params.myOutput,
+    ])
+
+   PREPARE_VCF_FILES(prepare_vcf_params_ch)
 
 }
