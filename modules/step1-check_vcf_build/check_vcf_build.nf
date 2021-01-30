@@ -3,7 +3,7 @@ nextflow.enable.dsl = 2
 //params.vcfFile
 
 process CHECK_VCF_BUILD {
-
+    publishDir "${params.outputDir}"
     container "gwas/imputation2"
 
     input:
@@ -34,7 +34,7 @@ else
     exit
 fi
 
-Rscript /app/required_tools/check_vcf_build/check_vcf_build.R $mydirname/$filename > !{params.myOutput}
+Rscript /app/required_tools/check_vcf_build/check_vcf_build.R $mydirname/$filename > !{myOutput}
 
         '''
 
@@ -45,7 +45,7 @@ Rscript /app/required_tools/check_vcf_build/check_vcf_build.R $mydirname/$filena
 }
 
 workflow test {
-
+    params.outputDir = "$launchDir/testData/"
     params.vcfFile = "$launchDir/testData/myvcf.vcf"
     params.myOutput = "$launchDir/testData/output.BuildChecked"
     
