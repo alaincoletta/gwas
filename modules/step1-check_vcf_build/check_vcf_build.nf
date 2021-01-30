@@ -3,6 +3,9 @@ nextflow.enable.dsl = 2
 //params.vcfFile
 
 process CHECK_VCF_BUILD {
+
+    container "gwas/imputation2"
+
     input:
     tuple path(vcfFile),
     path(myOutput)
@@ -12,9 +15,11 @@ process CHECK_VCF_BUILD {
 
     shell:
         '''
-myinput=!{vcfFile}
+echo "!{params.vcfFile}"
+echo "!{params.myOutput}"
+myinput=!{params.vcfFile}
 if [[ ${myinput} == *.vcf ]]; then
-    echo "Input autosome list detected, run parallel pipeline."
+    echo "Input autosome list detected"
     my_chr1='my_chr1.txt'
     cat ${myinput} | awk '$1==1 {print$0}' > $my_chr1
     mydirname=$PWD
@@ -29,7 +34,7 @@ else
     exit
 fi
 
-Rscript /app/required_tools/check_vcf_build/check_vcf_build.R $mydirname/$filename > !{params.myoutput}
+Rscript /app/required_tools/check_vcf_build/check_vcf_build.R $mydirname/$filename > !{params.myOutput}
 
         '''
 
@@ -41,12 +46,12 @@ Rscript /app/required_tools/check_vcf_build/check_vcf_build.R $mydirname/$filena
 
 workflow test {
 
-    params.vcfFile = "$baseDir/testData/myvcf.vcf"
-    params.myOutput = "$baseDir/testData/output.BuildChecked"
+    params.vcfFile = "$launchDir/testData/myvcf.vcf"
+    params.myOutput = "$launchDir/testData/output.BuildChecked"
     
     check_vcf_params_ch = Channel.of([
-            file(params.vcfFile),
-            file(params.myOutput),
+            params.vcfFile,
+            params.myOutput,
     ])
 
     CHECK_VCF_BUILD(check_vcf_params_ch)
