@@ -10,14 +10,14 @@ process CHECK_VCF_BUILD {
     tuple path(vcfFile),
     path(myOutput)
 
-    output:
-    path(myOutput)
+    // output:
+    // path(params.myOutput)
 
     shell:
         '''
-echo "!{params.vcfFile}"
-echo "!{params.myOutput}"
-myinput=!{params.vcfFile}
+echo "!{vcfFile}"
+echo "!{myOutput}"
+myinput=!{vcfFile}
 if [[ ${myinput} == *.vcf ]]; then
     echo "Input autosome list detected"
     my_chr1='my_chr1.txt'
